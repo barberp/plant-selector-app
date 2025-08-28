@@ -21,6 +21,7 @@ export function PlantSelector({ onPlantSelect }: PlantSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlant, setSelectedPlant] = useState('');
   const { height } = Dimensions.get('window');
+  const searchInputRef = useRef<TextInput>(null);
 
   const filteredPlants = EDIBLE_PLANTS
     .filter(plant => 
@@ -33,6 +34,19 @@ export function PlantSelector({ onPlantSelect }: PlantSelectorProps) {
     setSearchQuery('');
     setIsOpen(false);
     onPlantSelect(plant.name);
+    
+    // Reset the dropdown after a short delay to show the selection was made
+    setTimeout(() => {
+      setSelectedPlant('');
+    }, 500);
+  };
+
+  const handleOpenModal = () => {
+    setIsOpen(true);
+    // Focus the search input after the modal opens
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 100);
   };
 
   const renderPlantItem = ({ item }: { item: typeof EDIBLE_PLANTS[0] }) => (
@@ -52,7 +66,7 @@ export function PlantSelector({ onPlantSelect }: PlantSelectorProps) {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.selector}
-        onPress={() => setIsOpen(true)}
+        onPress={handleOpenModal}
       >
         <Text style={[
           styles.selectorText,
@@ -84,6 +98,7 @@ export function PlantSelector({ onPlantSelect }: PlantSelectorProps) {
             <View style={styles.searchContainer}>
               <Search size={18} color="#6b7280" style={styles.searchIcon} />
               <TextInput
+                ref={searchInputRef}
                 style={styles.searchInput}
                 placeholder="Search plants..."
                 value={searchQuery}
